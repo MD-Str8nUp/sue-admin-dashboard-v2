@@ -299,6 +299,18 @@ function taskCompletionText(item) {
   return item.completedAt ? `Completed ${formatDateTime(item.completedAt)}` : "Completed: Not recorded";
 }
 
+function findTaskForCompletionEntry(entry) {
+  if (!entry) return null;
+  const key = String(entry.id || entry.taskKey || "");
+  const sourceRow = Number(entry.sourceRow || 0) || null;
+  return state.tasks.find((item) => {
+    if (key && String(item.id) === key) return true;
+    if (!sourceRow) return false;
+    const match = /^sheet-task-(\d+)$/.exec(String(item.id || ""));
+    return match && Number(match[1]) === sourceRow;
+  }) || null;
+}
+
 function renderItemList({ key, targetId, emptyText, title, meta, actions, items, pill }) {
   const list = document.getElementById(targetId);
   const template = document.getElementById("item-template");
@@ -640,6 +652,47 @@ function setupTrackViews() {
   });
 }
 
+function setMoreView(view = "") {
+  const chooser = document.getElementById("more-action-centre");
+  const personal = document.getElementById("more-personal-content");
+  const settings = document.getElementById("more-settings-content");
+  if (!chooser || !personal || !settings) return;
+
+  chooser.hidden = Boolean(view);
+  personal.hidden = view !== "personal";
+  settings.hidden = view !== "settings";
+
+  document.querySelectorAll("[data-more-view]").forEach((control) => {
+    const active = control.dataset.moreView === view;
+    control.classList.toggle("is-selected", active);
+    control.setAttribute("aria-expanded", String(active));
+  });
+}
+
+function moreViewForTarget(target) {
+  if (!target) return "";
+  if (target === "#settings-panel" || target === "#xena-title" || target === "#backend-config-title" || target === "#privacy-title") return "settings";
+  if (target === "#workflow5-panel" || target === "#workflow5-title") return "personal";
+  return "";
+}
+
+function setupMoreViews() {
+  document.querySelectorAll("[data-more-view]").forEach((control) => {
+    control.addEventListener("click", () => {
+      const view = control.dataset.moreView;
+      setMoreView(view);
+      const target = view === "settings" ? "#settings-panel" : "#workflow5-title";
+      window.setTimeout(() => scrollTo(target), 30);
+    });
+  });
+  document.querySelectorAll("[data-more-back]").forEach((control) => {
+    control.addEventListener("click", () => {
+      setMoreView();
+      window.setTimeout(() => scrollTo("#more-intro-title"), 30);
+    });
+  });
+}
+
 const captureDetailPanelIds = ["quick-task-panel", "email-draft-panel", "letter-packer-panel", "workflow4-panel"];
 const captureDetailTargets = {
   "quick-task": "quick-task-panel",
@@ -706,6 +759,7 @@ function setupActionJumps() {
       if (captureDetail) openCaptureDetail(captureDetail, control);
       const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
       if (control.dataset.jumpTab === "track-tab") setTrackView(trackViewForTarget(target));
+      if (control.dataset.jumpTab === "more-tab") setMoreView(moreViewForTarget(target));
       window.setTimeout(() => scrollTo(target, control.dataset.focusTarget), 60);
     });
   });
@@ -825,16 +879,39 @@ function reminderDueCount() {
 }
 
 function completedTasksForProgress() {
-  const tasks = state.tasks
-    .filter((item) => normaliseTaskStatus(item.status) === "Done")
-    .map((item) => ({
-      id: taskKey(item),
-      title: displayTaskTitle(item) || "Completed task",
-      completedAt: normaliseDateTime(item.completedAt),
-      source: isSheetTask(item) ? "sheet" : "local"
-    }));
+  const byKey = new Map();
 
-  return tasks.sort((a, b) => {
+  state.tasks
+    .filter((item) => normaliseTaskStatus(item.status) === "Done")
+    .forEach((item) => {
+      const sheetMatch = /^sheet-task-(\d+)$/.exec(String(item.id || ""));
+      const entry = {
+        id: taskKey(item),
+        taskKey: taskKey(item),
+        title: displayTaskTitle(item) || "Completed task",
+        completedAt: normaliseDateTime(item.completedAt),
+        sourceRow: sheetMatch ? Number(sheetMatch[1]) : null,
+        source: isSheetTask(item) ? "sheet" : "local",
+        status: "Done"
+      };
+      byKey.set(completionHistoryKey(entry), entry);
+    });
+
+  normaliseCompletionHistory(state.completionHistory).forEach((item) => {
+    const entry = {
+      id: String(item.taskKey || item.id || item.title || createId()),
+      taskKey: String(item.taskKey || item.id || item.title || ""),
+      title: String(item.title || "Completed task").trim(),
+      completedAt: normaliseDateTime(item.completedAt),
+      sourceRow: item.sourceRow || null,
+      source: item.sourceRow ? "sheet" : "local",
+      status: "Done"
+    };
+    if (!entry.completedAt) return;
+    byKey.set(completionHistoryKey(entry), entry);
+  });
+
+  return Array.from(byKey.values()).sort((a, b) => {
     if (a.completedAt && b.completedAt) return new Date(b.completedAt) - new Date(a.completedAt);
     if (a.completedAt) return -1;
     if (b.completedAt) return 1;
@@ -943,15 +1020,12 @@ function renderProgress() {
     const date = document.createElement("span");
     date.textContent = entry.completedAt ? `Completed ${formatDateTime(entry.completedAt)}` : "Completed: Not recorded";
     row.append(title, date);
-    const task = state.tasks.find((item) => String(item.id) === String(entry.id));
-    if (task) {
-      const restore = document.createElement("button");
-      restore.type = "button";
-      restore.className = "progress-history__restore";
-      restore.textContent = "Move to In progress";
-      restore.addEventListener("click", () => moveKanbanTask(task.id, "Done", "Waiting", row));
-      row.append(restore);
-    }
+    const restore = document.createElement("button");
+    restore.type = "button";
+    restore.className = "progress-history__restore";
+    restore.textContent = "Move to In progress";
+    restore.addEventListener("click", () => moveCompletedHistoryEntryToInProgress(entry, row));
+    row.append(restore);
     history.append(row);
   });
 }
@@ -966,6 +1040,17 @@ function removeCompletionHistoryForTask(task) {
   state.completionHistory = normaliseCompletionHistory(state.completionHistory).filter((entry) => {
     if (sourceRow && Number(entry.sourceRow || entry.rowNumber || 0) === sourceRow) return false;
     return String(entry.taskKey || entry.id || "") !== key;
+  });
+}
+
+function removeCompletionHistoryEntry(entry) {
+  if (!entry) return;
+  const sourceRow = Number(entry.sourceRow || 0) || null;
+  const key = String(entry.taskKey || entry.id || "");
+  state.completionHistory = normaliseCompletionHistory(state.completionHistory).filter((item) => {
+    if (sourceRow && Number(item.sourceRow || item.rowNumber || 0) === sourceRow) return false;
+    if (key && String(item.taskKey || item.id || "") === key) return false;
+    return completionHistoryKey(item) !== completionHistoryKey(entry);
   });
 }
 
@@ -1346,6 +1431,54 @@ async function moveKanbanTask(taskId, fromStatus, toStatus, card) {
   saveState();
   kanbanBusy = false;
   setKanbanStatus(`Moved local demo task “${displayTaskTitle(task) || "task"}” to ${label} (this browser only).`, "info");
+  renderAll();
+}
+
+async function moveCompletedHistoryEntryToInProgress(entry, row) {
+  if (kanbanBusy) return;
+  const title = String(entry && entry.title ? entry.title : "task");
+  const sourceRow = Number(entry && entry.sourceRow ? entry.sourceRow : 0);
+  const existingTask = findTaskForCompletionEntry(entry);
+
+  if (existingTask) {
+    await moveKanbanTask(existingTask.id, "Done", "Waiting", row);
+    return;
+  }
+
+  if (row) row.classList.add("kanban-card--saving");
+  kanbanBusy = true;
+
+  if (sourceRow) {
+    setKanbanStatus(`Saving “${title}” → In progress…`, "info");
+    try {
+      await sheetWrite("updateTaskStatus", { rowNumber: sourceRow, status: taskStatusForSheetWrite("Waiting") });
+      removeCompletionHistoryEntry(entry);
+      saveState();
+      setKanbanStatus(`Saved “${title}” as In progress.`, "success");
+      setApiStatus("Saved to Google Sheet.", "success");
+    } catch (err) {
+      const detail = err && err.message ? err.message : String(err);
+      setKanbanStatus(`Could not save to Google Sheet — task stayed Done. ${detail}`, "error");
+      setApiStatus(`Sheet write failed — status not changed. ${detail}`, "error");
+    } finally {
+      kanbanBusy = false;
+      renderAll();
+    }
+    return;
+  }
+
+  const task = {
+    id: String(entry && (entry.taskKey || entry.id) ? (entry.taskKey || entry.id) : createId()),
+    title,
+    due: "",
+    status: "Waiting",
+    completedAt: ""
+  };
+  state.tasks.push(task);
+  removeCompletionHistoryEntry(entry);
+  saveState();
+  kanbanBusy = false;
+  setKanbanStatus(`Moved local demo task “${title}” to In progress (this browser only).`, "info");
   renderAll();
 }
 
@@ -3128,6 +3261,7 @@ function setupDashboardTabs() {
     } else {
       restoreCaptureDetailPanels();
     }
+    if (selected.tab.id === "more-tab") setMoreView();
   }
 
   tabs.forEach((item) => {
@@ -3158,6 +3292,7 @@ setupForms();
 setupPersonalHealth();
 setupDashboardTabs();
 setupTrackViews();
+setupMoreViews();
 setupActionJumps();
 renderAll();
 hydrateFromSheetApi();

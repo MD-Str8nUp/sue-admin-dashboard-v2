@@ -3754,6 +3754,76 @@ input:focus, select:focus, textarea:focus {
   font-weight: 700;
 }
 
+/* More mirrors the quiet two-row action screen in the Version 2 mockup. */
+.more-action-centre {
+  width: min(680px, 100%);
+  margin: 0 auto;
+  padding: 18px 0 24px;
+}
+.more-action-centre h2 {
+  margin: 0;
+  color: var(--v2-teal);
+  font-family: var(--v2-serif);
+  font-size: 2.45rem;
+  font-weight: 600;
+  line-height: 1.08;
+}
+.more-action-centre > p {
+  margin: 7px 0 20px;
+  color: var(--v2-muted);
+  font-size: 1rem;
+}
+.more-action-list { display: grid; gap: 12px; }
+.more-action-row {
+  width: 100%;
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(236, 231, 220, 0.94);
+  border-radius: 15px;
+  background: #fffdf9;
+  box-shadow: 0 7px 20px rgba(31, 42, 58, 0.055);
+  text-align: left;
+}
+.more-action-row:hover { border-color: var(--v2-line); box-shadow: 0 10px 24px rgba(31, 42, 58, 0.09); }
+.more-action-row:focus-visible, .more-back-button:focus-visible { outline: 3px solid rgba(45, 138, 132, 0.35); outline-offset: 3px; }
+.more-action-row__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+.more-action-row--personal .more-action-row__icon { background: var(--v2-teal); color: #fff; }
+.more-action-row--settings .more-action-row__icon { background: #e6e6e4; color: #656662; }
+.more-action-row__copy { min-width: 0; }
+.more-action-row__copy strong, .more-action-row__copy small { display: block; }
+.more-action-row__copy strong { color: var(--v2-ink); font-size: 1rem; line-height: 1.22; }
+.more-action-row__copy small { margin-top: 3px; color: var(--v2-muted); font-size: 0.82rem; line-height: 1.25; }
+.more-action-row__chevron { color: #9ba4a6; font-size: 1.75rem; font-weight: 400; line-height: 1; }
+.more-view-content { display: grid; gap: 12px; }
+.more-view-content[hidden], .more-action-centre[hidden] { display: none; }
+.more-back-button {
+  justify-self: start;
+  min-height: 44px;
+  padding: 8px 2px;
+  border: 0;
+  background: transparent;
+  color: var(--v2-teal);
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  #more-panel { display: block; }
+  .more-action-centre { padding: 4px 0 18px; }
+  .more-action-centre h2 { font-size: 2.25rem; }
+  .more-action-centre > p { margin-bottom: 18px; font-size: 0.96rem; }
+}
+
 /* Home board overrides: placed last so the mobile preview stays a clear three-state stack. */
 .home-progress-board {
   display: grid;
