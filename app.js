@@ -1020,13 +1020,22 @@ function renderProgress() {
     const date = document.createElement("span");
     date.textContent = entry.completedAt ? `Completed ${formatDateTime(entry.completedAt)}` : "Completed: Not recorded";
     row.append(title, date);
-    const restore = document.createElement("button");
-    restore.type = "button";
-    restore.className = "progress-history__restore";
-    restore.textContent = "↩ Restore to In progress";
-    restore.setAttribute("aria-label", `Restore ${entry.title} to In progress`);
-    restore.addEventListener("click", () => moveCompletedHistoryEntryToInProgress(entry, row));
-    row.append(restore);
+    const moveMenu = document.createElement("details");
+    moveMenu.className = "progress-history__move-menu";
+    const moveSummary = document.createElement("summary");
+    moveSummary.textContent = "Move";
+    moveSummary.setAttribute("aria-label", `Move ${entry.title} back to the Kanban`);
+    const moveChoices = document.createElement("div");
+    moveChoices.className = "progress-history__move-choices";
+    ["Open", "Waiting"].forEach((status) => {
+      const choice = document.createElement("button");
+      choice.type = "button";
+      choice.textContent = KANBAN_STATUS_LABEL[status];
+      choice.addEventListener("click", () => moveCompletedHistoryEntryToInProgress(entry, row, status));
+      moveChoices.append(choice);
+    });
+    moveMenu.append(moveSummary, moveChoices);
+    row.append(moveMenu);
     history.append(row);
   });
 }
@@ -1435,14 +1444,16 @@ async function moveKanbanTask(taskId, fromStatus, toStatus, card) {
   renderAll();
 }
 
-async function moveCompletedHistoryEntryToInProgress(entry, row) {
+async function moveCompletedHistoryEntryToInProgress(entry, row, targetStatus = "Waiting") {
   if (kanbanBusy) return;
   const title = String(entry && entry.title ? entry.title : "task");
   const sourceRow = Number(entry && entry.sourceRow ? entry.sourceRow : 0);
   const existingTask = findTaskForCompletionEntry(entry);
+  const nextStatus = normaliseTaskStatus(targetStatus);
+  const label = KANBAN_STATUS_LABEL[nextStatus] || nextStatus;
 
   if (existingTask) {
-    await moveKanbanTask(existingTask.id, "Done", "Waiting", row);
+    await moveKanbanTask(existingTask.id, "Done", nextStatus, row);
     return;
   }
 
@@ -1452,10 +1463,10 @@ async function moveCompletedHistoryEntryToInProgress(entry, row) {
   if (sourceRow) {
     setKanbanStatus(`Saving “${title}” → In progress…`, "info");
     try {
-      await sheetWrite("updateTaskStatus", { rowNumber: sourceRow, status: taskStatusForSheetWrite("Waiting") });
+      await sheetWrite("updateTaskStatus", { rowNumber: sourceRow, status: taskStatusForSheetWrite(nextStatus) });
       removeCompletionHistoryEntry(entry);
       saveState();
-      setKanbanStatus(`Saved “${title}” as In progress.`, "success");
+      setKanbanStatus(`Saved “${title}” as ${label}.`, "success");
       setApiStatus("Saved to Google Sheet.", "success");
     } catch (err) {
       const detail = err && err.message ? err.message : String(err);
@@ -1472,14 +1483,14 @@ async function moveCompletedHistoryEntryToInProgress(entry, row) {
     id: String(entry && (entry.taskKey || entry.id) ? (entry.taskKey || entry.id) : createId()),
     title,
     due: "",
-    status: "Waiting",
+    status: nextStatus,
     completedAt: ""
   };
   state.tasks.push(task);
   removeCompletionHistoryEntry(entry);
   saveState();
   kanbanBusy = false;
-  setKanbanStatus(`Moved local demo task “${title}” to In progress (this browser only).`, "info");
+  setKanbanStatus(`Moved local demo task “${title}” to ${label} (this browser only).`, "info");
   renderAll();
 }
 

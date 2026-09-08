@@ -606,7 +606,24 @@ h2 {
 .progress-stats span { display: block; color: var(--muted); font-size: .72rem; font-weight: 800; line-height: 1.2; text-transform: uppercase; }
 .progress-stats strong { display: block; margin-top: 2px; color: var(--navy); font-size: 1.55rem; }
 .progress-subtitle { margin: 0; color: var(--navy); font-size: .95rem; }
-.progress-history__item { display: grid; gap: 2px; padding: 10px; border-left: 3px solid var(--success); background: #f4faf6; border-radius: 0 var(--radius) var(--radius) 0; }
+.progress-history__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 2px;
+  padding: 9px 10px;
+  border-left: 3px solid var(--success);
+  background: #f4faf6;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.progress-history__item strong,
+.progress-history__item span {
+  min-width: 0;
+}
+.progress-history__item strong {
+  grid-column: 1;
+}
 .progress-history__item span { color: var(--muted); font-size: .82rem; }
 .progress-panel { overflow: hidden; }
 
@@ -807,7 +824,11 @@ body.kanban-dragging .kanban-card { touch-action: none; }
   .progress-stats div { padding: 8px 6px; }
   .progress-stats span { font-size: .62rem; overflow-wrap: anywhere; }
   .progress-stats strong { font-size: 1.35rem; }
-  .progress-history__item { padding: 9px; }
+  .progress-history__item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 6px;
+    padding: 8px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -3744,18 +3765,74 @@ input:focus, select:focus, textarea:focus {
 #capture-panel .quick-capture-panel.is-open { display: block; }
 
 .progress-history__restore {
-  justify-self: start;
-  margin-top: 4px;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: end;
+  width: auto;
+  white-space: nowrap;
+  margin: 0;
   min-height: 0;
-  padding: 3px 0;
+  padding: 3px 2px;
   border: 0;
   border-radius: 0;
   background: transparent;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.progress-history__restore:hover,
+.progress-history__restore:focus-visible {
+  color: var(--v2-teal, #3b988f);
+}
+
+.progress-history__move-menu {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  align-self: center;
+}
+.progress-history__move-menu summary {
+  cursor: pointer;
   color: var(--v2-teal, #3b988f);
   font-size: 0.82rem;
   font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  list-style: none;
+}
+.progress-history__move-menu summary::-webkit-details-marker { display: none; }
+.progress-history__move-menu summary::after { content: "⌄"; margin-left: 3px; font-size: 0.7rem; }
+.progress-history__move-choices {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  top: calc(100% + 5px);
+  display: grid;
+  min-width: 112px;
+  padding: 5px;
+  border: 1px solid var(--v2-line, #e7dfd3);
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 10px 24px rgba(31, 42, 58, 0.12);
+}
+.progress-history__move-choices button {
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--v2-ink, #1f2a3a);
+  text-align: left;
+  font-size: 0.78rem;
+}
+.progress-history__move-choices button:hover { background: #edf7f4; }
+
+@media (max-width: 560px) {
+  .progress-history__restore {
+    font-size: 0.72rem;
+    padding: 2px 0 2px 4px;
+  }
 }
 
 /* More mirrors the quiet two-row action screen in the Version 2 mockup. */
