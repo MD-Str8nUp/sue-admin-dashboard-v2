@@ -656,29 +656,48 @@ function setupActionJumps() {
 }
 
 function renderHomePreview() {
-  const list = document.getElementById("home-in-progress-list");
-  if (list) {
+  const renderHomeColumn = (listId, countId, items, emptyText, titleFor, metaFor) => {
+    const list = document.getElementById(listId);
+    const count = document.getElementById(countId);
+    if (!list) return;
     list.innerHTML = "";
-    const active = state.tasks
-      .filter((item) => normaliseTaskStatus(item.status) === "Waiting")
-      .slice(0, 4);
-    if (!active.length) {
+    if (count) count.textContent = String(items.length);
+    if (!items.length) {
       const empty = document.createElement("li");
       empty.className = "home-progress-list__empty";
-      empty.textContent = "No tasks are in progress.";
+      empty.textContent = emptyText;
       list.append(empty);
-    } else {
-      active.forEach((item) => {
-        const row = document.createElement("li");
-        const title = document.createElement("strong");
-        title.textContent = displayTaskTitle(item) || "Task";
-        const meta = document.createElement("span");
-        meta.textContent = taskMetaText(item);
-        row.append(title, meta);
-        list.append(row);
-      });
+      return;
     }
-  }
+    items.forEach((item) => {
+      const row = document.createElement("li");
+      const title = document.createElement("strong");
+      title.textContent = titleFor(item) || "Task";
+      const meta = document.createElement("span");
+      meta.textContent = metaFor(item);
+      row.append(title, meta);
+      list.append(row);
+    });
+  };
+
+  const active = state.tasks.filter((item) => normaliseTaskStatus(item.status) !== "Done");
+  const todo = active.filter((item) => normaliseTaskStatus(item.status) === "Open").slice(0, 2);
+  const inProgress = active.filter((item) => normaliseTaskStatus(item.status) === "Waiting").slice(0, 2);
+  const monday = weekStartDate();
+  const doneThisWeek = completedTasksForProgress()
+    .filter((entry) => entry.completedAt && new Date(entry.completedAt) >= monday)
+    .slice(0, 2);
+
+  renderHomeColumn("home-todo-list", "home-todo-count", todo, "Nothing to do right now.", displayTaskTitle, taskMetaText);
+  renderHomeColumn("home-in-progress-list", "home-in-progress-count", inProgress, "Nothing in progress right now.", displayTaskTitle, taskMetaText);
+  renderHomeColumn(
+    "home-done-list",
+    "home-done-count",
+    doneThisWeek,
+    "Nothing completed this week.",
+    (entry) => entry.title,
+    (entry) => entry.completedAt ? `Completed ${new Date(entry.completedAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" })}` : "Completed"
+  );
 
   const healthPreview = document.getElementById("home-health-preview");
   if (healthPreview) {
