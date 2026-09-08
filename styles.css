@@ -526,6 +526,7 @@ h2 {
   min-width: 0;
   max-width: 100%;
 }
+.kanban-swipe-hint { display: none; }
 .kanban-col {
   display: flex;
   flex-direction: column;
@@ -719,6 +720,18 @@ body.kanban-dragging .kanban-card { touch-action: none; }
 }
 
 @media (max-width: 640px) {
+  .kanban-swipe-hint {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    margin: -4px 2px 6px;
+    color: var(--v2-teal);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .kanban-swipe-hint span { font-size: 1rem; }
+
   .progress-kanban {
     display: flex;
     flex-wrap: nowrap;
