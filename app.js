@@ -741,7 +741,7 @@ function openCaptureDetail(name, trigger = null) {
   rememberCaptureDetailLocations();
   const targetPanelId = captureDetailTargets[name];
   const targetPanel = targetPanelId ? document.getElementById(targetPanelId) : null;
-  const isAlreadyOpen = Boolean(trigger?.classList.contains("is-selected") && targetPanel?.classList.contains("is-open"));
+  const isAlreadyOpen = trigger?.getAttribute("aria-expanded") === "true";
   if (isAlreadyOpen) {
     closeCaptureDetails();
     return;
@@ -766,12 +766,18 @@ function setupActionJumps() {
     control.addEventListener("click", (event) => {
       if (control.tagName.toLowerCase() === "a") event.preventDefault();
       const captureDetail = control.dataset.captureOpen;
+      const targetPanelId = captureDetailTargets[captureDetail];
+      const targetPanel = targetPanelId ? document.getElementById(targetPanelId) : null;
+      const closeQuickTask = captureDetail === "quick-task"
+        && control.dataset.jumpTab === "capture-tab"
+        && control.classList.contains("is-selected")
+        && targetPanel?.classList.contains("is-open");
       activateTab(control.dataset.jumpTab);
-      if (captureDetail) openCaptureDetail(captureDetail, control);
+      if (captureDetail && !closeQuickTask) openCaptureDetail(captureDetail, control);
       const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
       if (control.dataset.jumpTab === "track-tab") setTrackView(trackViewForTarget(target));
       if (control.dataset.jumpTab === "more-tab") setMoreView(moreViewForTarget(target));
-      window.setTimeout(() => scrollTo(target, control.dataset.focusTarget), 60);
+      window.setTimeout(() => scrollTo(closeQuickTask ? "#capture-chooser-title" : target, closeQuickTask ? null : control.dataset.focusTarget), 60);
     });
   });
 }
