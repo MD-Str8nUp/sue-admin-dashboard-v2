@@ -7,8 +7,8 @@ Preview build of Sue's Admin Dashboard with a reworked four-tab navigation
 
 - **Home** — daily start and Quick Capture (Today calendar, Quick Capture,
   Today workload, This week, Upcoming deadlines).
-- **Work** — the existing draft-only tools: Clinical Note Formatter, Post-session
-  Email Draft, Letter + PDF Packer, Appointment + Telehealth Prep, and Matter Hub.
+- **Work** — the four existing draft-only tools: Clinic Notes + Follow-up Email,
+  Letter + PDF Packer, Appointment + Telehealth Prep, and Matter Hub.
 - **My week** — Kanban progress board, Health tracker, and Herstory (week by week).
 - **More** — Personal admin category guide (Workflow 5), Information for Xena,
   privacy notice, and backend endpoint settings.

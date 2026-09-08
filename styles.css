@@ -232,7 +232,7 @@ h2 {
 
 .view-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
   padding: 4px;
   background: #e8eef5;
@@ -323,6 +323,190 @@ h2 {
 
 .tab-panel[hidden] {
   display: none !important;
+}
+
+.preview-label {
+  width: fit-content;
+  margin-bottom: 8px;
+  padding: 3px 8px;
+  border: 1px solid #c8d9ec;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--navy);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.preview-label--small {
+  margin: 0;
+  font-size: .66rem;
+}
+
+.action-centre,
+.home-strip,
+.balance-preview,
+.capture-chooser-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  min-width: 0;
+}
+
+.action-centre {
+  background: linear-gradient(135deg, #f7fbff 0%, #edf6ed 100%);
+}
+
+.action-centre__date {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+}
+
+.action-centre h2 {
+  margin-bottom: 14px;
+  color: var(--navy);
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  line-height: 1.12;
+}
+
+.action-grid,
+.capture-option-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action-card,
+.capture-option,
+.balance-card,
+.link-button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  color: var(--navy);
+  text-align: left;
+  text-decoration: none;
+}
+
+.action-card,
+.capture-option,
+.balance-card {
+  display: grid;
+  gap: 5px;
+  align-content: start;
+  padding: 14px;
+}
+
+.action-card {
+  border-top-width: 4px;
+}
+
+.action-card--teal { border-top-color: #1f7a76; }
+.action-card--sky { border-top-color: #316ca8; }
+.action-card--coral { border-top-color: #b45f4a; }
+.action-card--sage { border-top-color: #4f7b55; }
+
+.action-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--pale);
+  color: var(--navy);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.action-card strong,
+.capture-option strong,
+.balance-card strong {
+  font-size: .98rem;
+  line-height: 1.2;
+}
+
+.action-card small,
+.capture-option span,
+.balance-card span {
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.3;
+}
+
+.home-strip__header,
+.balance-preview {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-strip__header {
+  margin-bottom: 10px;
+}
+
+.link-button {
+  padding: 6px 10px;
+  color: var(--navy);
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.home-progress-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-progress-list li {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid #b7811c;
+  border-radius: var(--radius);
+  background: #ffffff;
+}
+
+.home-progress-list span,
+.home-progress-list__empty {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.balance-preview__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  min-width: min(420px, 100%);
+}
+
+.balance-card--health { border-top: 4px solid #256a4d; }
+.balance-card--history { border-top: 4px solid #8a5b9f; }
+
+.capture-option-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.capture-option-grid--primary {
+  margin-top: 8px;
+}
+
+.capture-option:hover,
+.action-card:hover,
+.balance-card:hover,
+.link-button:hover {
+  border-color: #8aa6c5;
+  box-shadow: 0 8px 18px rgba(18, 38, 63, .1);
 }
 
 .progress-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 18px; }
@@ -588,6 +772,12 @@ body.kanban-dragging .kanban-card { touch-action: none; }
 .collapsible-panel[open] .collapsible-panel__state::before { content: "Hide"; }
 .collapsible-panel__body { border-top: 1px solid var(--line-soft); padding: 16px; }
 .collapsible-panel__body .panel__header { padding: 0 0 12px; }
+.work-tool-group__body { display: grid; gap: 12px; }
+.work-subtool {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: #ffffff;
+}
 
 @media (max-width: 560px) {
   .calendar-placeholder { align-items: flex-start; flex-direction: column; gap: 4px; padding: 10px 12px; }
