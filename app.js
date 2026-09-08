@@ -456,10 +456,11 @@ function busyBlockDetails(item) {
 }
 
 function focusClinicalTool(practice, tool) {
+  activateTab("work-tab");
   document.getElementById("clinical-practice").value = practice === "Feel Good" ? "Feelgood" : "Awarely";
   const panelId = tool === "email" ? "email-draft-panel" : "clinical-note-panel";
   const panel = document.getElementById(panelId);
-  panel.open = true;
+  openContainingDetails(panel);
   panel.scrollIntoView({ behavior: "smooth", block: "start" });
   if (tool === "email") document.getElementById("email-purpose").focus();
   else document.getElementById("clinical-raw-notes").focus();
@@ -576,6 +577,76 @@ function renderSummary() {
   document.getElementById("summary-open-tasks").textContent = String(openTasks);
   document.getElementById("summary-overdue").textContent = String(overdue);
   document.getElementById("summary-upcoming").textContent = String(upcoming);
+}
+
+function openContainingDetails(el) {
+  let node = el;
+  while (node) {
+    if (node instanceof HTMLDetailsElement) node.open = true;
+    node = node.parentElement;
+  }
+}
+
+function activateTab(tabId) {
+  const tab = document.getElementById(tabId);
+  if (tab) tab.click();
+}
+
+function scrollTo(selector, focusSelector) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  openContainingDetails(el);
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (!focusSelector) return;
+  const target = document.querySelector(focusSelector);
+  if (!target) return;
+  openContainingDetails(target);
+  window.setTimeout(() => {
+    try { target.focus({ preventScroll: true }); } catch { target.focus(); }
+  }, 300);
+}
+
+function setupActionJumps() {
+  document.querySelectorAll("[data-jump-tab]").forEach((control) => {
+    control.addEventListener("click", (event) => {
+      if (control.tagName.toLowerCase() === "a") event.preventDefault();
+      activateTab(control.dataset.jumpTab);
+      const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
+      window.setTimeout(() => scrollTo(target, control.dataset.focusTarget), 60);
+    });
+  });
+}
+
+function renderHomePreview() {
+  const list = document.getElementById("home-in-progress-list");
+  if (list) {
+    list.innerHTML = "";
+    const active = state.tasks
+      .filter((item) => normaliseTaskStatus(item.status) === "Waiting")
+      .slice(0, 4);
+    if (!active.length) {
+      const empty = document.createElement("li");
+      empty.className = "home-progress-list__empty";
+      empty.textContent = "No tasks are in progress.";
+      list.append(empty);
+    } else {
+      active.forEach((item) => {
+        const row = document.createElement("li");
+        const title = document.createElement("strong");
+        title.textContent = displayTaskTitle(item) || "Task";
+        const meta = document.createElement("span");
+        meta.textContent = taskMetaText(item);
+        row.append(title, meta);
+        list.append(row);
+      });
+    }
+  }
+
+  const healthPreview = document.getElementById("home-health-preview");
+  if (healthPreview) {
+    const doneCount = healthWeekDates().filter((iso) => healthState.days[iso]).length;
+    healthPreview.textContent = `${doneCount}/7 activity, ${healthState.strength}/2 strength, ${healthState.yoga}/2 yoga`;
+  }
 }
 
 function weekStartDate() {
@@ -695,6 +766,7 @@ function renderAll() {
   });
 
   fillXenaForm();
+  renderHomePreview();
   renderProgress();
 }
 
@@ -2337,26 +2409,6 @@ function setupWorkflow5() {
     setStatus("Category updated in this page only.", "info");
   }
 
-  function activateTab(tabId) {
-    const tab = document.getElementById(tabId);
-    if (tab) tab.click();
-  }
-
-  function scrollTo(selector, focusSelector) {
-    const el = document.querySelector(selector);
-    if (!el) return;
-    if (typeof el.open === "boolean") el.open = true;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (focusSelector) {
-      const target = document.querySelector(focusSelector);
-      if (target) {
-        window.setTimeout(() => {
-          try { target.focus({ preventScroll: true }); } catch { target.focus(); }
-        }, 300);
-      }
-    }
-  }
-
   renderChips();
   renderActive();
 
@@ -2375,7 +2427,7 @@ function setupWorkflow5() {
   });
 
   function goToCapture() {
-    activateTab("home-tab");
+    activateTab("capture-tab");
     scrollTo("#capture-title", "#capture-text");
     setStatus("Quick Capture focused. Paste the phrase and save the task there.", "info");
   }
@@ -2384,29 +2436,29 @@ function setupWorkflow5() {
   goCapture.addEventListener("click", goToCapture);
 
   goWeek.addEventListener("click", () => {
-    activateTab("home-tab");
+    activateTab("capture-tab");
     scrollTo("#week-title");
     setStatus("Jumped to This week. Tasks appear here once saved via Quick Capture.", "info");
   });
 
   goDeadlines.addEventListener("click", () => {
-    activateTab("home-tab");
+    activateTab("capture-tab");
     scrollTo("#deadlines-title");
     setStatus("Jumped to Upcoming deadlines.", "info");
   });
 
   goProgress.addEventListener("click", () => {
-    activateTab("myweek-tab");
+    activateTab("track-tab");
     scrollTo("#progress-title");
     window.setTimeout(() => {
       const kanban = document.getElementById("progress-kanban");
       if (kanban) kanban.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }, 250);
-    setStatus("My week view opened. The Kanban shows tasks as they move.", "info");
+    setStatus("Track view opened. The Kanban shows tasks as they move.", "info");
   });
 
   goHealth.addEventListener("click", () => {
-    activateTab("myweek-tab");
+    activateTab("track-tab");
     scrollTo("#personal-health-title");
     setStatus("Health view opened. Personal admin does not write here.", "info");
   });
@@ -2879,8 +2931,9 @@ function setupPersonalHealth() {
 function setupDashboardTabs() {
   const tabs = [
     { tab: document.getElementById("home-tab"), panel: document.getElementById("home-panel") },
+    { tab: document.getElementById("capture-tab"), panel: document.getElementById("capture-panel") },
     { tab: document.getElementById("work-tab"), panel: document.getElementById("work-panel") },
-    { tab: document.getElementById("myweek-tab"), panel: document.getElementById("myweek-panel") },
+    { tab: document.getElementById("track-tab"), panel: document.getElementById("track-panel") },
     { tab: document.getElementById("more-tab"), panel: document.getElementById("more-panel") }
   ].filter((item) => item.tab && item.panel);
 
@@ -2918,6 +2971,7 @@ setupWorkflow5();
 setupForms();
 setupPersonalHealth();
 setupDashboardTabs();
+setupActionJumps();
 renderAll();
 hydrateFromSheetApi();
 
