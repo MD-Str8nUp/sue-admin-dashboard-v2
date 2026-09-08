@@ -740,7 +740,31 @@
       </section>
 
       <section id="track-panel" class="tab-panel" role="tabpanel" aria-labelledby="track-tab" hidden>
-        <section class="panel progress-panel" aria-labelledby="progress-title">
+        <section class="track-action-centre" id="track-action-centre" aria-labelledby="track-action-centre-title">
+          <h2 id="track-action-centre-title">Track</h2>
+          <p>See what’s moving. Stay balanced.</p>
+          <div class="track-action-list" aria-label="Track options">
+            <button class="track-action-row track-action-row--work" type="button" data-track-view="work">
+              <span class="track-action-row__icon" aria-hidden="true">☷</span>
+              <span class="track-action-row__copy"><strong>Work board</strong><small>Your tasks at a glance</small></span>
+              <span class="track-action-row__chevron" aria-hidden="true">›</span>
+            </button>
+            <button class="track-action-row track-action-row--health" type="button" data-track-view="health">
+              <span class="track-action-row__icon" aria-hidden="true">♡</span>
+              <span class="track-action-row__copy"><strong>Health</strong><small>Check in and reflect</small></span>
+              <span class="track-action-row__chevron" aria-hidden="true">›</span>
+            </button>
+            <a class="track-action-row track-action-row--herstory" href="history.html">
+              <span class="track-action-row__icon" aria-hidden="true">⌁</span>
+              <span class="track-action-row__copy"><strong>Herstory</strong><small>Small moments matter</small></span>
+              <span class="track-action-row__chevron" aria-hidden="true">›</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="track-view-content" id="track-work-content" aria-labelledby="progress-title" hidden>
+          <button class="track-back-button" type="button" data-track-back>‹ Back to Track</button>
+          <section class="panel progress-panel" aria-labelledby="progress-title">
           <div class="panel__header">
             <h2 id="progress-title" class="section-title">Work progress</h2>
             <p class="section-hint">A running record of completed work. Active tasks stay in Work.</p>
@@ -779,8 +803,11 @@
             <ul class="list progress-history" id="progress-history"></ul>
           </details>
           <p class="kanban-status" id="kanban-status" role="status" aria-live="polite" hidden></p>
+          </section>
         </section>
 
+      <section class="track-view-content" id="track-health-content" aria-labelledby="personal-health-title" hidden>
+        <button class="track-back-button" type="button" data-track-back>‹ Back to Track</button>
       <section class="panel personal-health" aria-labelledby="personal-health-title">
         <div class="panel__header panel__header--split">
           <div>
@@ -835,6 +862,7 @@
         <div class="actions">
           <a class="button" href="history.html" aria-label="Open Herstory — Week by week">Open Herstory — Week by week</a>
         </div>
+      </section>
       </section>
       </section>
 

@@ -606,15 +606,58 @@ function scrollTo(selector, focusSelector) {
   }, 300);
 }
 
+function openQuickTaskPanel() {
+  document.getElementById("quick-task-panel")?.classList.add("is-open");
+}
+
+function setTrackView(view = "") {
+  const chooser = document.getElementById("track-action-centre");
+  const work = document.getElementById("track-work-content");
+  const health = document.getElementById("track-health-content");
+  if (!chooser || !work || !health) return;
+
+  chooser.hidden = Boolean(view);
+  work.hidden = view !== "work";
+  health.hidden = view !== "health";
+}
+
+function trackViewForTarget(target) {
+  if (target === "#personal-health-title") return "health";
+  if (target === "#progress-title") return "work";
+  return "";
+}
+
+function setupTrackViews() {
+  document.querySelectorAll("[data-track-view]").forEach((control) => {
+    control.addEventListener("click", () => {
+      const view = control.dataset.trackView;
+      setTrackView(view);
+      const target = view === "health" ? "#personal-health-title" : "#progress-title";
+      window.setTimeout(() => scrollTo(target), 30);
+    });
+  });
+  document.querySelectorAll("[data-track-back]").forEach((control) => {
+    control.addEventListener("click", () => {
+      setTrackView();
+      window.setTimeout(() => scrollTo("#track-action-centre-title"), 30);
+    });
+  });
+}
+
+function jumpOpensQuickTask(control) {
+  return control.dataset.captureOpen === "quick-task" ||
+    control.dataset.focusTarget === "#capture-text" ||
+    control.dataset.jumpTarget === "#capture-title";
+}
+
 function setupActionJumps() {
   document.querySelectorAll("[data-jump-tab]").forEach((control) => {
     control.addEventListener("click", (event) => {
       if (control.tagName.toLowerCase() === "a") event.preventDefault();
-      if (control.dataset.captureOpen === "quick-task") {
-        document.getElementById("quick-task-panel")?.classList.add("is-open");
-      }
+      if (control.dataset.jumpTab === "capture-tab" && jumpOpensQuickTask(control)) openQuickTaskPanel();
       activateTab(control.dataset.jumpTab);
       const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
+      if (control.dataset.jumpTab === "track-tab") setTrackView(trackViewForTarget(target));
       window.setTimeout(() => scrollTo(target, control.dataset.focusTarget), 60);
     });
   });
@@ -2431,6 +2474,7 @@ function setupWorkflow5() {
 
   function goToCapture() {
     activateTab("capture-tab");
+    openQuickTaskPanel();
     scrollTo("#capture-title", "#capture-text");
     setStatus("Quick Capture focused. Paste the phrase and save the task there.", "info");
   }
@@ -2452,6 +2496,7 @@ function setupWorkflow5() {
 
   goProgress.addEventListener("click", () => {
     activateTab("track-tab");
+    setTrackView("work");
     scrollTo("#progress-title");
     window.setTimeout(() => {
       const kanban = document.getElementById("progress-kanban");
@@ -2462,6 +2507,7 @@ function setupWorkflow5() {
 
   goHealth.addEventListener("click", () => {
     activateTab("track-tab");
+    setTrackView("health");
     scrollTo("#personal-health-title");
     setStatus("Health view opened. Personal admin does not write here.", "info");
   });
@@ -2951,7 +2997,10 @@ function setupDashboardTabs() {
   }
 
   tabs.forEach((item) => {
-    item.tab.addEventListener("click", () => selectTab(item));
+    item.tab.addEventListener("click", () => {
+      selectTab(item);
+      if (item.tab.id === "track-tab") setTrackView();
+    });
     item.tab.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
       event.preventDefault();
@@ -2974,6 +3023,7 @@ setupWorkflow5();
 setupForms();
 setupPersonalHealth();
 setupDashboardTabs();
+setupTrackViews();
 setupActionJumps();
 renderAll();
 hydrateFromSheetApi();
