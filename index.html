@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sue Admin Dashboard — Version 2 preview</title>
-    <link rel="stylesheet" href="styles.css?v=home-work-board-1">
+    <link rel="stylesheet" href="styles.css?v=capture-details-on-tap-1">
   </head>
   <body>
     <div class="v2-banner" role="note">
@@ -81,26 +81,26 @@
           </div>
         </section>
 
-        <section class="home-strip" aria-labelledby="home-in-progress-title">
+        <section class="home-strip" aria-labelledby="home-status-title">
           <div class="home-strip__header">
-            <h2 id="home-in-progress-title" class="section-title">In progress</h2>
+            <h2 id="home-status-title" class="section-title">Home status</h2>
             <span class="preview-label preview-label--small">Version 2 preview</span>
             <button class="link-button" type="button" data-jump-tab="track-tab" data-jump-target="#progress-title">Open Track</button>
           </div>
-        <div class="home-progress-board" aria-label="Work at a glance">
-          <section class="home-progress-column home-progress-column--todo" aria-labelledby="home-todo-title">
-            <h3 id="home-todo-title">To do <span id="home-todo-count">0</span></h3>
-            <ul class="home-progress-list" id="home-todo-list"></ul>
-          </section>
-          <section class="home-progress-column home-progress-column--in-progress" aria-labelledby="home-in-progress-title">
-            <h3 id="home-in-progress-title">In progress <span id="home-in-progress-count">0</span></h3>
-            <ul class="home-progress-list" id="home-in-progress-list"></ul>
-          </section>
-          <section class="home-progress-column home-progress-column--done" aria-labelledby="home-done-title">
-            <h3 id="home-done-title">Done this week <span id="home-done-count">0</span></h3>
-            <ul class="home-progress-list" id="home-done-list"></ul>
-          </section>
-        </div>
+          <div class="home-progress-board" aria-label="Work at a glance">
+            <section class="home-progress-column home-progress-column--todo" aria-labelledby="home-todo-title">
+              <h3 id="home-todo-title">To do <span id="home-todo-count">0</span></h3>
+              <ul class="home-progress-list" id="home-todo-list"></ul>
+            </section>
+            <section class="home-progress-column home-progress-column--in-progress" aria-labelledby="home-in-progress-column-title">
+              <h3 id="home-in-progress-column-title">In progress <span id="home-in-progress-count">0</span></h3>
+              <ul class="home-progress-list" id="home-in-progress-list"></ul>
+            </section>
+            <section class="home-progress-column home-progress-column--done" aria-labelledby="home-done-title">
+              <h3 id="home-done-title">Done this week <span id="home-done-count">0</span></h3>
+              <ul class="home-progress-list" id="home-done-list"></ul>
+            </section>
+          </div>
         </section>
 
         <section class="balance-preview" aria-labelledby="balance-preview-title">

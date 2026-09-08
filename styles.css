@@ -2824,12 +2824,53 @@ h1, h2, .section-title, .action-centre h2 {
   font-weight: 500;
   font-size: 1.15rem;
 }
+.home-progress-board {
+  align-items: stretch;
+  gap: 12px;
+}
+.home-progress-column {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border-color: var(--v2-line);
+  border-radius: 14px;
+  background: #fffaf1;
+}
+.home-progress-column--todo { border-top-color: var(--v2-sky); }
+.home-progress-column--in-progress { border-top-color: var(--v2-coral); background: #fff5ef; }
+.home-progress-column--done { border-top-color: var(--v2-sage); background: #eef7f2; }
+.home-progress-column h3 {
+  color: var(--v2-ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+.home-progress-column h3 span {
+  background: rgba(31, 42, 58, 0.07);
+  color: var(--v2-ink);
+}
+.home-progress-column .home-progress-list {
+  display: grid;
+  gap: 8px;
+}
 .home-progress-list li {
   border-color: var(--v2-line);
   border-left-color: var(--v2-teal);
   background: var(--v2-surface);
   padding: 10px 12px;
   border-radius: 10px;
+}
+.home-progress-column--todo .home-progress-list li { border-left-color: var(--v2-sky); }
+.home-progress-column--in-progress .home-progress-list li { border-left-color: var(--v2-coral); }
+.home-progress-column--done .home-progress-list li { border-left-color: var(--v2-sage); }
+.home-progress-column .home-progress-list__empty {
+  min-height: 72px;
+  display: grid;
+  align-content: center;
+  border-style: dashed;
+  border-left-width: 1px;
+  color: var(--v2-muted);
 }
 .link-button {
   border: 1px solid var(--v2-line);
@@ -3140,6 +3181,38 @@ input:focus, select:focus, textarea:focus {
   .home-progress-list span {
     margin-bottom: 12px;
     font-size: 0.78rem;
+  }
+
+  .home-progress-board {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .home-progress-column {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(236, 231, 220, 0.84);
+    border-top-width: 4px;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(31, 42, 58, 0.07);
+  }
+
+  .home-progress-column .home-progress-list {
+    display: grid;
+    gap: 8px;
+    overflow: visible;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+
+  .home-progress-column .home-progress-list li {
+    flex: none;
+    min-height: 0;
+    padding: 10px 12px;
+    border-left-width: 4px;
+    box-shadow: none;
+    scroll-snap-align: none;
   }
 
   .balance-preview {
@@ -3650,6 +3723,13 @@ input:focus, select:focus, textarea:focus {
     font-size: 0.62rem;
   }
 }
+
+/* Capture remains a simple four-row screen until an action is selected. */
+#capture-panel .quick-capture-panel:not(.is-open),
+#capture-panel > .capture-option-grid:not(.capture-option-grid--primary),
+#capture-panel > .dashboard-grid { display: none; }
+
+#capture-panel .quick-capture-panel.is-open { display: block; }
 
 /* Home board overrides: placed last so the mobile preview stays a clear three-state stack. */
 .home-progress-board {

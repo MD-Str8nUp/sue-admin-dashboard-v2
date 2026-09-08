@@ -644,10 +644,9 @@ function setupActionJumps() {
   document.querySelectorAll("[data-jump-tab]").forEach((control) => {
     control.addEventListener("click", (event) => {
       if (control.tagName.toLowerCase() === "a") event.preventDefault();
-      if (control.dataset.captureOpen === "quick-task") {
-        document.getElementById("quick-task-panel")?.classList.add("is-open");
-      }
+      const openQuickTask = control.dataset.captureOpen === "quick-task";
       activateTab(control.dataset.jumpTab);
+      if (openQuickTask) document.getElementById("quick-task-panel")?.classList.add("is-open");
       const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
       if (control.dataset.jumpTab === "track-tab") setTrackView(trackViewForTarget(target));
       window.setTimeout(() => scrollTo(target, control.dataset.focusTarget), 60);
@@ -681,12 +680,9 @@ function renderHomePreview() {
   };
 
   const active = state.tasks.filter((item) => normaliseTaskStatus(item.status) !== "Done");
-  const todo = active.filter((item) => normaliseTaskStatus(item.status) === "Open").slice(0, 2);
-  const inProgress = active.filter((item) => normaliseTaskStatus(item.status) === "Waiting").slice(0, 2);
-  const monday = weekStartDate();
-  const doneThisWeek = completedTasksForProgress()
-    .filter((entry) => entry.completedAt && new Date(entry.completedAt) >= monday)
-    .slice(0, 2);
+  const todo = active.filter((item) => normaliseTaskStatus(item.status) === "Open");
+  const inProgress = active.filter((item) => normaliseTaskStatus(item.status) === "Waiting");
+  const doneThisWeek = completedThisWeekForHome();
 
   renderHomeColumn("home-todo-list", "home-todo-count", todo, "Nothing to do right now.", displayTaskTitle, taskMetaText);
   renderHomeColumn("home-in-progress-list", "home-in-progress-count", inProgress, "Nothing in progress right now.", displayTaskTitle, taskMetaText);
@@ -696,7 +692,7 @@ function renderHomePreview() {
     doneThisWeek,
     "Nothing completed this week.",
     (entry) => entry.title,
-    (entry) => entry.completedAt ? `Completed ${new Date(entry.completedAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" })}` : "Completed"
+    (entry) => entry.completedAt ? `Completed ${formatDateTime(entry.completedAt)}` : "Completed"
   );
 
   const healthPreview = document.getElementById("home-health-preview");
@@ -704,6 +700,46 @@ function renderHomePreview() {
     const doneCount = healthWeekDates().filter((iso) => healthState.days[iso]).length;
     healthPreview.textContent = `${doneCount}/7 activity, ${healthState.strength}/2 strength, ${healthState.yoga}/2 yoga`;
   }
+}
+
+function completedThisWeekForHome() {
+  const monday = weekStartDate();
+  return homeCompletionEntries()
+    .filter((entry) => entry.completedAt && new Date(entry.completedAt) >= monday)
+    .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+}
+
+function homeCompletionEntries() {
+  const byKey = new Map();
+
+  completedTasksForProgress().forEach((entry) => {
+    const sheetMatch = /^sheet-task-(\d+)$/.exec(String(entry.id || entry.taskKey || ""));
+    const clean = {
+      id: String(entry.id || entry.taskKey || entry.title || createId()),
+      taskKey: String(entry.taskKey || entry.id || entry.title || ""),
+      title: String(entry.title || "Completed task").trim(),
+      completedAt: normaliseDateTime(entry.completedAt),
+      sourceRow: sheetMatch ? Number(sheetMatch[1]) : null,
+      status: "Done"
+    };
+    if (!clean.completedAt) return;
+    byKey.set(completionHistoryKey(clean), clean);
+  });
+
+  normaliseCompletionHistory(state.completionHistory).forEach((entry) => {
+    const clean = {
+      id: String(entry.id || entry.taskKey || entry.title || createId()),
+      taskKey: String(entry.taskKey || entry.id || entry.title || ""),
+      title: String(entry.title || "Completed task").trim(),
+      completedAt: normaliseDateTime(entry.completedAt),
+      sourceRow: entry.sourceRow || null,
+      status: "Done"
+    };
+    if (!clean.completedAt) return;
+    byKey.set(completionHistoryKey(clean), clean);
+  });
+
+  return Array.from(byKey.values());
 }
 
 function weekStartDate() {
@@ -3004,6 +3040,10 @@ function setupDashboardTabs() {
       tab.classList.toggle("is-active", active);
       panel.hidden = !active;
     });
+    // Return Capture to its four action rows whenever it is opened from navigation.
+    if (selected.tab.id === "capture-tab") {
+      document.getElementById("quick-task-panel")?.classList.remove("is-open");
+    }
   }
 
   tabs.forEach((item) => {
