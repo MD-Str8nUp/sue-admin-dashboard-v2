@@ -3744,14 +3744,18 @@ input:focus, select:focus, textarea:focus {
 #capture-panel .quick-capture-panel.is-open { display: block; }
 
 .progress-history__restore {
-  margin-top: 8px;
-  min-height: 36px;
-  padding: 7px 10px;
-  border: 1px solid var(--v2-teal, #3b988f);
-  border-radius: 9px;
-  background: #fff;
+  justify-self: start;
+  margin-top: 4px;
+  min-height: 0;
+  padding: 3px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--v2-teal, #3b988f);
+  font-size: 0.82rem;
   font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* More mirrors the quiet two-row action screen in the Version 2 mockup. */

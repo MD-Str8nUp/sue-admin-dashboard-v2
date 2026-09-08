@@ -1023,7 +1023,8 @@ function renderProgress() {
     const restore = document.createElement("button");
     restore.type = "button";
     restore.className = "progress-history__restore";
-    restore.textContent = "Move to In progress";
+    restore.textContent = "↩ Restore to In progress";
+    restore.setAttribute("aria-label", `Restore ${entry.title} to In progress`);
     restore.addEventListener("click", () => moveCompletedHistoryEntryToInProgress(entry, row));
     row.append(restore);
     history.append(row);
