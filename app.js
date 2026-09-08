@@ -606,10 +606,6 @@ function scrollTo(selector, focusSelector) {
   }, 300);
 }
 
-function openQuickTaskPanel() {
-  document.getElementById("quick-task-panel")?.classList.add("is-open");
-}
-
 function setTrackView(view = "") {
   const chooser = document.getElementById("track-action-centre");
   const work = document.getElementById("track-work-content");
@@ -644,17 +640,13 @@ function setupTrackViews() {
   });
 }
 
-function jumpOpensQuickTask(control) {
-  return control.dataset.captureOpen === "quick-task" ||
-    control.dataset.focusTarget === "#capture-text" ||
-    control.dataset.jumpTarget === "#capture-title";
-}
-
 function setupActionJumps() {
   document.querySelectorAll("[data-jump-tab]").forEach((control) => {
     control.addEventListener("click", (event) => {
       if (control.tagName.toLowerCase() === "a") event.preventDefault();
-      if (control.dataset.jumpTab === "capture-tab" && jumpOpensQuickTask(control)) openQuickTaskPanel();
+      if (control.dataset.captureOpen === "quick-task") {
+        document.getElementById("quick-task-panel")?.classList.add("is-open");
+      }
       activateTab(control.dataset.jumpTab);
       const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
       if (control.dataset.jumpTab === "track-tab") setTrackView(trackViewForTarget(target));
@@ -2474,7 +2466,6 @@ function setupWorkflow5() {
 
   function goToCapture() {
     activateTab("capture-tab");
-    openQuickTaskPanel();
     scrollTo("#capture-title", "#capture-text");
     setStatus("Quick Capture focused. Paste the phrase and save the task there.", "info");
   }
