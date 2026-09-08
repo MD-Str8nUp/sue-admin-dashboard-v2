@@ -726,6 +726,8 @@ function closeCaptureDetails() {
   document.querySelectorAll("[data-capture-open]").forEach((control) => {
     control.classList.remove("is-selected");
     control.setAttribute("aria-expanded", "false");
+    const label = control.querySelector("span");
+    if (label && control.dataset.closedLabel) label.textContent = control.dataset.closedLabel;
   });
   captureDetailPanelIds.forEach((id) => {
     const panel = document.getElementById(id);
@@ -737,8 +739,15 @@ function closeCaptureDetails() {
 
 function openCaptureDetail(name, trigger = null) {
   rememberCaptureDetailLocations();
+  const targetPanelId = captureDetailTargets[name];
+  const targetPanel = targetPanelId ? document.getElementById(targetPanelId) : null;
+  const isAlreadyOpen = Boolean(trigger?.classList.contains("is-selected") && targetPanel?.classList.contains("is-open"));
+  if (isAlreadyOpen) {
+    closeCaptureDetails();
+    return;
+  }
   closeCaptureDetails();
-  const panel = document.getElementById(captureDetailTargets[name]);
+  const panel = targetPanel;
   const host = document.getElementById("capture-detail-host");
   if (!panel) return;
   if (host && panel.id !== "quick-task-panel") host.append(panel);
@@ -747,6 +756,8 @@ function openCaptureDetail(name, trigger = null) {
   if (trigger) {
     trigger.classList.add("is-selected");
     trigger.setAttribute("aria-expanded", "true");
+    const label = trigger.querySelector("span");
+    if (label && trigger.dataset.openLabel) label.textContent = trigger.dataset.openLabel;
   }
 }
 
@@ -1031,7 +1042,7 @@ function renderProgress() {
       const choice = document.createElement("button");
       choice.type = "button";
       choice.textContent = KANBAN_STATUS_LABEL[status];
-      choice.addEventListener("click", () => moveCompletedHistoryEntryToInProgress(entry, row, status));
+      choice.addEventListener("click", () => moveCompletedHistoryEntryToKanban(entry, row, status));
       moveChoices.append(choice);
     });
     moveMenu.append(moveSummary, moveChoices);
@@ -1444,7 +1455,7 @@ async function moveKanbanTask(taskId, fromStatus, toStatus, card) {
   renderAll();
 }
 
-async function moveCompletedHistoryEntryToInProgress(entry, row, targetStatus = "Waiting") {
+async function moveCompletedHistoryEntryToKanban(entry, row, targetStatus = "Waiting") {
   if (kanbanBusy) return;
   const title = String(entry && entry.title ? entry.title : "task");
   const sourceRow = Number(entry && entry.sourceRow ? entry.sourceRow : 0);
@@ -1461,7 +1472,7 @@ async function moveCompletedHistoryEntryToInProgress(entry, row, targetStatus = 
   kanbanBusy = true;
 
   if (sourceRow) {
-    setKanbanStatus(`Saving “${title}” → In progress…`, "info");
+    setKanbanStatus(`Saving “${title}” → ${label}…`, "info");
     try {
       await sheetWrite("updateTaskStatus", { rowNumber: sourceRow, status: taskStatusForSheetWrite(nextStatus) });
       removeCompletionHistoryEntry(entry);

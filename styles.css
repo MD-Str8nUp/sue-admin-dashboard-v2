@@ -3553,6 +3553,17 @@ input:focus, select:focus, textarea:focus {
     line-height: 1;
   }
 
+  #capture-panel .capture-option-grid--primary .capture-option.is-selected::after {
+    content: "⌃";
+    color: var(--v2-teal);
+    font-size: 1.2rem;
+  }
+
+  #capture-panel .capture-option-grid--primary .capture-option.is-selected {
+    border-color: var(--v2-teal);
+    box-shadow: 0 8px 20px rgba(59, 152, 143, 0.14);
+  }
+
   #capture-panel .capture-option-grid--primary .capture-option:nth-child(1)::before { content: "+"; background: var(--v2-teal); color: #fff; }
   #capture-panel .capture-option-grid--primary .capture-option:nth-child(2)::before { content: "✎"; background: #dbeaf8; color: #4f94c6; }
   #capture-panel .capture-option-grid--primary .capture-option:nth-child(3)::before { content: "▱"; background: #ffe0d9; color: #df6d61; }
@@ -3764,31 +3775,6 @@ input:focus, select:focus, textarea:focus {
 
 #capture-panel .quick-capture-panel.is-open { display: block; }
 
-.progress-history__restore {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: center;
-  justify-self: end;
-  width: auto;
-  white-space: nowrap;
-  margin: 0;
-  min-height: 0;
-  padding: 3px 2px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.76rem;
-  font-weight: 800;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.progress-history__restore:hover,
-.progress-history__restore:focus-visible {
-  color: var(--v2-teal, #3b988f);
-}
-
 .progress-history__move-menu {
   grid-column: 2;
   grid-row: 1 / span 2;
@@ -3827,13 +3813,6 @@ input:focus, select:focus, textarea:focus {
   font-size: 0.78rem;
 }
 .progress-history__move-choices button:hover { background: #edf7f4; }
-
-@media (max-width: 560px) {
-  .progress-history__restore {
-    font-size: 0.72rem;
-    padding: 2px 0 2px 4px;
-  }
-}
 
 /* More mirrors the quiet two-row action screen in the Version 2 mockup. */
 .more-action-centre {
