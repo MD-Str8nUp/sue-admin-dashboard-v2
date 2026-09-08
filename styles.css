@@ -3483,6 +3483,7 @@ input:focus, select:focus, textarea:focus {
 .track-action-row__chevron { color: #9ba4a6; font-size: 1.75rem; font-weight: 400; line-height: 1; }
 
 .track-view-content { display: grid; gap: 12px; }
+.track-view-content[hidden] { display: none; }
 .track-action-centre[hidden],
 .track-view-content[hidden] { display: none; }
 .track-back-button {
