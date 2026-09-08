@@ -3245,8 +3245,24 @@ input:focus, select:focus, textarea:focus {
   #work-panel > .collapsible-panel > .collapsible-panel__summary > span:first-child {
     display: grid;
     grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-rows: auto auto;
     align-items: center;
     gap: 13px;
+  }
+
+  #work-panel > .collapsible-panel > .collapsible-panel__summary > span:first-child::before {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  #work-panel > .collapsible-panel > .collapsible-panel__summary > span:first-child strong {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #work-panel > .collapsible-panel > .collapsible-panel__summary > span:first-child small {
+    grid-column: 2;
+    grid-row: 2;
   }
 
   #work-panel > .collapsible-panel > .collapsible-panel__summary .collapsible-panel__state {
