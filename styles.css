@@ -526,7 +526,6 @@ h2 {
   min-width: 0;
   max-width: 100%;
 }
-.kanban-swipe-hint { display: none; }
 .kanban-col {
   display: flex;
   flex-direction: column;
@@ -720,18 +719,6 @@ body.kanban-dragging .kanban-card { touch-action: none; }
 }
 
 @media (max-width: 640px) {
-  .kanban-swipe-hint {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 5px;
-    margin: -4px 2px 6px;
-    color: var(--v2-teal);
-    font-size: 0.78rem;
-    font-weight: 700;
-  }
-  .kanban-swipe-hint span { font-size: 1rem; }
-
   .progress-kanban {
     display: flex;
     flex-wrap: nowrap;
@@ -3516,20 +3503,79 @@ input:focus, select:focus, textarea:focus {
   .track-action-centre > p { margin-bottom: 18px; font-size: 0.96rem; }
 
   /* Keep every Kanban state visible on phones, including an empty Done column. */
-  .kanban-swipe-hint { display: none; }
-  .progress-kanban {
+  #track-work-content .progress-kanban {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    width: 100%;
+    max-width: 100%;
     overflow: visible;
     padding: 0;
-    margin: 10px 0 18px;
+    margin: 8px 0 16px;
   }
-  .kanban-col {
+  #track-work-content .kanban-col {
     flex: none;
     max-width: none;
     width: 100%;
     min-height: 0;
+    padding: 6px 4px;
+    scroll-snap-align: none;
   }
-  .kanban-col__list { min-height: 44px; }
+  #track-work-content .kanban-col__header { margin-bottom: 5px; }
+  #track-work-content .kanban-col__title {
+    display: grid;
+    justify-items: start;
+    gap: 3px;
+    font-size: 0.58rem;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+  #track-work-content .kanban-col__count {
+    min-width: 18px;
+    padding: 0 5px;
+    font-size: 0.62rem;
+  }
+  #track-work-content .kanban-col__list {
+    gap: 5px;
+    min-height: 44px;
+    padding: 2px;
+  }
+  #track-work-content .kanban-card {
+    gap: 2px;
+    padding: 6px 5px;
+  }
+  #track-work-content .kanban-card__header {
+    display: grid;
+    gap: 3px;
+  }
+  #track-work-content .kanban-card__title {
+    font-size: 0.66rem;
+    line-height: 1.18;
+  }
+  #track-work-content .kanban-card__meta {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+  #track-work-content .kanban-card__badge {
+    justify-self: start;
+    padding: 0 4px;
+    font-size: 0.52rem;
+  }
+  #track-work-content .kanban-card__controls { margin-top: 4px; }
+  #track-work-content .kanban-card__move {
+    width: 100%;
+    min-height: 30px;
+    padding: 2px 4px;
+    border-radius: 7px;
+    font-size: 0.6rem;
+  }
+  #track-work-content .kanban-card__menu {
+    right: auto;
+    left: 0;
+    min-width: min(138px, 76vw);
+  }
+  #track-work-content .kanban-card--empty {
+    padding: 8px 4px;
+    font-size: 0.62rem;
+  }
 }
