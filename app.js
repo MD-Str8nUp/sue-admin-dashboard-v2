@@ -610,6 +610,9 @@ function setupActionJumps() {
   document.querySelectorAll("[data-jump-tab]").forEach((control) => {
     control.addEventListener("click", (event) => {
       if (control.tagName.toLowerCase() === "a") event.preventDefault();
+      if (control.dataset.captureOpen === "quick-task") {
+        document.getElementById("quick-task-panel")?.classList.add("is-open");
+      }
       activateTab(control.dataset.jumpTab);
       const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
       window.setTimeout(() => scrollTo(target, control.dataset.focusTarget), 60);
