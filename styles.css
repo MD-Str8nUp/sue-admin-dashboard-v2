@@ -3514,4 +3514,22 @@ input:focus, select:focus, textarea:focus {
   .track-action-centre { padding: 4px 0 18px; }
   .track-action-centre h2 { font-size: 2.25rem; }
   .track-action-centre > p { margin-bottom: 18px; font-size: 0.96rem; }
+
+  /* Keep every Kanban state visible on phones, including an empty Done column. */
+  .kanban-swipe-hint { display: none; }
+  .progress-kanban {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    overflow: visible;
+    padding: 0;
+    margin: 10px 0 18px;
+  }
+  .kanban-col {
+    flex: none;
+    max-width: none;
+    width: 100%;
+    min-height: 0;
+  }
+  .kanban-col__list { min-height: 44px; }
 }
