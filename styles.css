@@ -232,12 +232,62 @@ h2 {
 
 .view-tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   padding: 4px;
   background: #e8eef5;
   border: 1px solid #d3dce8;
   border-radius: 10px;
+}
+
+.v2-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: baseline;
+  justify-content: center;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, #12263f, #24405f);
+  color: #ffffff;
+  font-size: 14px;
+  text-align: center;
+}
+
+.v2-banner strong {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+.v2-banner span {
+  opacity: 0.85;
+}
+
+.topbar__version {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  background: var(--pale-strong);
+  color: var(--navy);
+}
+
+.work-intro,
+.more-intro {
+  padding: 16px 20px;
+}
+
+@media (max-width: 640px) {
+  .view-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .v2-banner {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
 }
 
 .view-tab {

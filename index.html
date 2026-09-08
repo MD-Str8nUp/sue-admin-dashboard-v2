@@ -3,14 +3,18 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sue’s Admin Dashboard</title>
+    <title>Sue Admin Dashboard — Version 2 preview</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div class="v2-banner" role="note">
+      <strong>Sue Admin Dashboard — Version 2 preview</strong>
+      <span>Navigation redesign preview. The original dashboard is unchanged.</span>
+    </div>
     <header class="topbar" role="banner">
       <div class="topbar__inner">
         <div class="topbar__brand">
-          <h1 class="topbar__title">Sue’s Admin Dashboard</h1>
+          <h1 class="topbar__title">Sue’s Admin Dashboard <span class="topbar__version">V2 preview</span></h1>
           <p class="topbar__subtitle">Personal planning — no client details</p>
         </div>
         <details class="topbar-menu">
@@ -34,9 +38,10 @@
 
     <main class="shell" id="main">
       <nav class="view-tabs" role="tablist" aria-label="Dashboard sections">
-        <button class="view-tab" id="work-tab" type="button" role="tab" aria-selected="true" aria-controls="work-panel">Work</button>
-        <button class="view-tab" id="progress-tab" type="button" role="tab" aria-selected="false" aria-controls="progress-panel" tabindex="-1">Progress</button>
-        <button class="view-tab" id="health-tab" type="button" role="tab" aria-selected="false" aria-controls="health-panel" tabindex="-1">Health</button>
+        <button class="view-tab" id="home-tab" type="button" role="tab" aria-selected="true" aria-controls="home-panel">Home</button>
+        <button class="view-tab" id="work-tab" type="button" role="tab" aria-selected="false" aria-controls="work-panel" tabindex="-1">Work</button>
+        <button class="view-tab" id="myweek-tab" type="button" role="tab" aria-selected="false" aria-controls="myweek-panel" tabindex="-1">My week</button>
+        <button class="view-tab" id="more-tab" type="button" role="tab" aria-selected="false" aria-controls="more-panel" tabindex="-1">More</button>
       </nav>
 
       <div class="sr-only" aria-live="polite">
@@ -45,7 +50,7 @@
         <span id="summary-upcoming">0</span>
       </div>
 
-      <section id="work-panel" class="tab-panel" role="tabpanel" aria-labelledby="work-tab">
+      <section id="home-panel" class="tab-panel" role="tabpanel" aria-labelledby="home-tab">
       <section class="calendar-placeholder" aria-labelledby="calendar-placeholder-title">
         <div>
           <span class="calendar-placeholder__eyebrow">Calendar</span>
@@ -196,6 +201,16 @@
         </section>
 
       </div>
+
+      </section><!-- /home-panel -->
+
+      <section id="work-panel" class="tab-panel" role="tabpanel" aria-labelledby="work-tab" hidden>
+      <section class="panel work-intro" aria-labelledby="work-intro-title">
+        <div class="panel__header">
+          <h2 id="work-intro-title" class="section-title">Work — draft-only tools</h2>
+          <p class="section-hint">All tools below are browser-only draft workspaces. Nothing is sent, saved to the Sheet, or written into a practice system.</p>
+        </div>
+      </section>
 
       <details class="panel collapsible-panel clinical-note" id="clinical-note-panel" aria-labelledby="clinical-note-title">
         <summary class="collapsible-panel__summary">
@@ -614,7 +629,7 @@
 
       </section>
 
-      <section id="progress-panel" class="tab-panel" role="tabpanel" aria-labelledby="progress-tab" hidden>
+      <section id="myweek-panel" class="tab-panel" role="tabpanel" aria-labelledby="myweek-tab" hidden>
         <section class="panel progress-panel" aria-labelledby="progress-title">
           <div class="panel__header">
             <h2 id="progress-title" class="section-title">Work progress</h2>
@@ -655,9 +670,7 @@
           </details>
           <p class="kanban-status" id="kanban-status" role="status" aria-live="polite" hidden></p>
         </section>
-      </section>
 
-      <section id="health-panel" class="tab-panel" role="tabpanel" aria-labelledby="health-tab" hidden>
       <section class="panel personal-health" aria-labelledby="personal-health-title">
         <div class="panel__header panel__header--split">
           <div>
@@ -715,12 +728,14 @@
       </section>
       </section>
 
-      <details class="settings-footer" id="settings-panel">
-        <summary class="settings-footer__summary">
-          <span class="settings-footer__label">Settings, backup and privacy</span>
-          <span class="settings-footer__state">Local-only Phase 1</span>
-        </summary>
-        <div class="secondary">
+      <section id="more-panel" class="tab-panel" role="tabpanel" aria-labelledby="more-tab" hidden>
+        <section class="panel more-intro" aria-labelledby="more-intro-title">
+          <div class="panel__header">
+            <h2 id="more-intro-title" class="section-title">More — personal admin &amp; settings</h2>
+            <p class="section-hint">Personal admin categories with Quick Capture guidance, plus Settings, backup and privacy.</p>
+          </div>
+        </section>
+        <div class="secondary" id="settings-panel">
           <section class="panel panel--xena" aria-labelledby="xena-title">
             <div class="panel__header panel__header--split">
               <div>
@@ -894,7 +909,7 @@
             </form>
           </section>
         </div>
-      </details>
+      </section>
     </main>
 
     <template id="item-template">

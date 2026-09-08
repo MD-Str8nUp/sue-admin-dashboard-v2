@@ -2375,7 +2375,7 @@ function setupWorkflow5() {
   });
 
   function goToCapture() {
-    activateTab("work-tab");
+    activateTab("home-tab");
     scrollTo("#capture-title", "#capture-text");
     setStatus("Quick Capture focused. Paste the phrase and save the task there.", "info");
   }
@@ -2384,29 +2384,29 @@ function setupWorkflow5() {
   goCapture.addEventListener("click", goToCapture);
 
   goWeek.addEventListener("click", () => {
-    activateTab("work-tab");
+    activateTab("home-tab");
     scrollTo("#week-title");
     setStatus("Jumped to This week. Tasks appear here once saved via Quick Capture.", "info");
   });
 
   goDeadlines.addEventListener("click", () => {
-    activateTab("work-tab");
+    activateTab("home-tab");
     scrollTo("#deadlines-title");
     setStatus("Jumped to Upcoming deadlines.", "info");
   });
 
   goProgress.addEventListener("click", () => {
-    activateTab("progress-tab");
+    activateTab("myweek-tab");
     scrollTo("#progress-title");
     window.setTimeout(() => {
       const kanban = document.getElementById("progress-kanban");
       if (kanban) kanban.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }, 250);
-    setStatus("Progress view opened. The Kanban shows tasks as they move.", "info");
+    setStatus("My week view opened. The Kanban shows tasks as they move.", "info");
   });
 
   goHealth.addEventListener("click", () => {
-    activateTab("health-tab");
+    activateTab("myweek-tab");
     scrollTo("#personal-health-title");
     setStatus("Health view opened. Personal admin does not write here.", "info");
   });
@@ -2878,10 +2878,11 @@ function setupPersonalHealth() {
 
 function setupDashboardTabs() {
   const tabs = [
+    { tab: document.getElementById("home-tab"), panel: document.getElementById("home-panel") },
     { tab: document.getElementById("work-tab"), panel: document.getElementById("work-panel") },
-    { tab: document.getElementById("progress-tab"), panel: document.getElementById("progress-panel") },
-    { tab: document.getElementById("health-tab"), panel: document.getElementById("health-panel") }
-  ];
+    { tab: document.getElementById("myweek-tab"), panel: document.getElementById("myweek-panel") },
+    { tab: document.getElementById("more-tab"), panel: document.getElementById("more-panel") }
+  ].filter((item) => item.tab && item.panel);
 
   function selectTab(selected) {
     tabs.forEach(({ tab, panel }) => {

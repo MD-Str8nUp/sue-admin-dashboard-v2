@@ -1,6 +1,28 @@
-# Sue’s Admin Dashboard
+# Sue Admin Dashboard — Version 2 preview
 
-Standalone Phase 1 static dashboard for privacy-first personal admin.
+Preview build of Sue's Admin Dashboard with a reworked four-tab navigation
+(**Home | Work | My week | More**). The original v1 dashboard is unchanged.
+
+## Version 2 navigation
+
+- **Home** — daily start and Quick Capture (Today calendar, Quick Capture,
+  Today workload, This week, Upcoming deadlines).
+- **Work** — the existing draft-only tools: Clinical Note Formatter, Post-session
+  Email Draft, Letter + PDF Packer, Appointment + Telehealth Prep, and Matter Hub.
+- **My week** — Kanban progress board, Health tracker, and Herstory (week by week).
+- **More** — Personal admin category guide (Workflow 5), Information for Xena,
+  privacy notice, and backend endpoint settings.
+
+All draft-only and privacy safeguards, and the Google Sheet integration
+behaviour, are preserved unchanged from v1.
+
+## Original v1
+
+The v1 dashboard remains untouched at
+[`sue-admin-dashboard`](../sue-admin-dashboard/) and its GitHub Pages site is
+not affected by this preview.
+
+## Scope
 
 ## Scope
 
