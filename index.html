@@ -137,15 +137,15 @@
               <strong>Quick task</strong>
               <span>Add a short task</span>
             </button>
-            <button class="capture-option" type="button" data-jump-tab="work-tab" data-jump-target="#email-draft-panel">
+            <button class="capture-option" type="button" data-capture-open="follow-up" data-jump-tab="capture-tab" data-jump-target="#email-draft-panel">
               <strong>Draft follow-up</strong>
               <span>Write a follow-up note</span>
             </button>
-            <button class="capture-option" type="button" data-jump-tab="work-tab" data-jump-target="#letter-packer-panel">
+            <button class="capture-option" type="button" data-capture-open="letter-pack" data-jump-tab="capture-tab" data-jump-target="#letter-packer-panel">
               <strong>Create letter pack</strong>
               <span>Build a letter pack</span>
             </button>
-            <button class="capture-option" type="button" data-jump-tab="work-tab" data-jump-target="#workflow4-panel" data-focus-target="#wf4-search">
+            <button class="capture-option" type="button" data-capture-open="resource" data-jump-tab="capture-tab" data-jump-target="#workflow4-panel" data-focus-target="#wf4-search">
               <strong>Find resource</strong>
               <span>Search guides and tools</span>
             </button>
@@ -190,6 +190,8 @@
             <p class="import-status import-status--info" id="capture-submit-status" role="status" aria-live="polite"></p>
           </form>
         </section>
+
+        <div id="capture-detail-host" class="capture-detail-host" aria-live="polite"></div>
 
         <div class="capture-option-grid" aria-label="Capture tools">
           <button class="capture-option" type="button" data-jump-tab="capture-tab" data-jump-target="#capture-title" data-focus-target="#capture-text">

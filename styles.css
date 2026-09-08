@@ -572,6 +572,27 @@ h2 {
   margin-top: 8px;
 }
 
+.capture-detail-host {
+  display: grid;
+  gap: 16px;
+}
+
+.capture-option.is-selected {
+  border-color: #5f8b86;
+  box-shadow: 0 8px 18px rgba(18, 38, 63, .1);
+}
+
+/* Capture opens to the category rows only; detail panels are revealed by row taps. */
+#capture-panel .quick-capture-panel:not(.is-open),
+#capture-panel > .capture-option-grid:not(.capture-option-grid--primary),
+#capture-panel > .dashboard-grid {
+  display: none;
+}
+
+#capture-panel .quick-capture-panel.is-open {
+  display: block;
+}
+
 .capture-option:hover,
 .action-card:hover,
 .balance-card:hover,
@@ -3535,16 +3556,7 @@ input:focus, select:focus, textarea:focus {
     line-height: 1.25;
   }
 
-  /* The mockup ends with the four action rows; legacy workspaces open only on request. */
-  #capture-panel .quick-capture-panel:not(.is-open),
-  #capture-panel > .capture-option-grid:not(.capture-option-grid--primary),
-  #capture-panel > .dashboard-grid {
-    display: none;
-  }
-
-  #capture-panel .quick-capture-panel.is-open {
-    display: block;
-  }
+  /* Viewport-specific row styling only; visibility is handled globally above. */
 }
 
 /* Track opens as a quiet action centre. The existing boards remain available on demand. */
@@ -3730,6 +3742,17 @@ input:focus, select:focus, textarea:focus {
 #capture-panel > .dashboard-grid { display: none; }
 
 #capture-panel .quick-capture-panel.is-open { display: block; }
+
+.progress-history__restore {
+  margin-top: 8px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--v2-teal, #3b988f);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--v2-teal, #3b988f);
+  font-weight: 700;
+}
 
 /* Home board overrides: placed last so the mobile preview stays a clear three-state stack. */
 .home-progress-board {

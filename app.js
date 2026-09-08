@@ -640,13 +640,70 @@ function setupTrackViews() {
   });
 }
 
+const captureDetailPanelIds = ["quick-task-panel", "email-draft-panel", "letter-packer-panel", "workflow4-panel"];
+const captureDetailTargets = {
+  "quick-task": "quick-task-panel",
+  "follow-up": "email-draft-panel",
+  "letter-pack": "letter-packer-panel",
+  resource: "workflow4-panel"
+};
+const captureOriginalLocations = new Map();
+
+function rememberCaptureDetailLocations() {
+  captureDetailPanelIds.forEach((id) => {
+    const panel = document.getElementById(id);
+    if (panel && !captureOriginalLocations.has(id)) {
+      captureOriginalLocations.set(id, { parent: panel.parentNode, nextSibling: panel.nextSibling });
+    }
+  });
+}
+
+function restoreCaptureDetailPanels() {
+  rememberCaptureDetailLocations();
+  captureDetailPanelIds.forEach((id) => {
+    const panel = document.getElementById(id);
+    const original = captureOriginalLocations.get(id);
+    if (!panel || !original?.parent || panel.parentNode === original.parent) return;
+    original.parent.insertBefore(panel, original.nextSibling);
+  });
+}
+
+function closeCaptureDetails() {
+  restoreCaptureDetailPanels();
+  document.querySelectorAll("[data-capture-open]").forEach((control) => {
+    control.classList.remove("is-selected");
+    control.setAttribute("aria-expanded", "false");
+  });
+  captureDetailPanelIds.forEach((id) => {
+    const panel = document.getElementById(id);
+    if (!panel) return;
+    panel.classList.remove("is-open");
+    if (panel.tagName.toLowerCase() === "details") panel.open = false;
+  });
+}
+
+function openCaptureDetail(name, trigger = null) {
+  rememberCaptureDetailLocations();
+  closeCaptureDetails();
+  const panel = document.getElementById(captureDetailTargets[name]);
+  const host = document.getElementById("capture-detail-host");
+  if (!panel) return;
+  if (host && panel.id !== "quick-task-panel") host.append(panel);
+  panel.classList.add("is-open");
+  if (panel.tagName.toLowerCase() === "details") panel.open = true;
+  if (trigger) {
+    trigger.classList.add("is-selected");
+    trigger.setAttribute("aria-expanded", "true");
+  }
+}
+
 function setupActionJumps() {
   document.querySelectorAll("[data-jump-tab]").forEach((control) => {
     control.addEventListener("click", (event) => {
       if (control.tagName.toLowerCase() === "a") event.preventDefault();
-      const openQuickTask = control.dataset.captureOpen === "quick-task";
+      const captureDetail = control.dataset.captureOpen;
       activateTab(control.dataset.jumpTab);
-      if (openQuickTask) document.getElementById("quick-task-panel")?.classList.add("is-open");
+      if (captureDetail) openCaptureDetail(captureDetail, control);
       const target = control.dataset.jumpTarget || `#${control.dataset.jumpTab}`;
       if (control.dataset.jumpTab === "track-tab") setTrackView(trackViewForTarget(target));
       window.setTimeout(() => scrollTo(target, control.dataset.focusTarget), 60);
@@ -885,12 +942,32 @@ function renderProgress() {
     const title = document.createElement("strong"); title.textContent = entry.title;
     const date = document.createElement("span");
     date.textContent = entry.completedAt ? `Completed ${formatDateTime(entry.completedAt)}` : "Completed: Not recorded";
-    row.append(title, date); history.append(row);
+    row.append(title, date);
+    const task = state.tasks.find((item) => String(item.id) === String(entry.id));
+    if (task) {
+      const restore = document.createElement("button");
+      restore.type = "button";
+      restore.className = "progress-history__restore";
+      restore.textContent = "Move to In progress";
+      restore.addEventListener("click", () => moveKanbanTask(task.id, "Done", "Waiting", row));
+      row.append(restore);
+    }
+    history.append(row);
   });
 }
 
 const KANBAN_STATUS_LABEL = { Open: "To do", Waiting: "In progress", Done: "Done" };
 let kanbanBusy = false;
+
+function removeCompletionHistoryForTask(task) {
+  const key = taskKey(task);
+  const sheetMatch = /^sheet-task-(\d+)$/.exec(String(task.id || ""));
+  const sourceRow = sheetMatch ? Number(sheetMatch[1]) : null;
+  state.completionHistory = normaliseCompletionHistory(state.completionHistory).filter((entry) => {
+    if (sourceRow && Number(entry.sourceRow || entry.rowNumber || 0) === sourceRow) return false;
+    return String(entry.taskKey || entry.id || "") !== key;
+  });
+}
 
 function setKanbanStatus(message, type = "info") {
   const el = document.getElementById("kanban-status");
@@ -1247,6 +1324,10 @@ async function moveKanbanTask(taskId, fromStatus, toStatus, card) {
     setKanbanStatus(`Saving “${displayTaskTitle(task) || "task"}” → ${label}…`, "info");
     try {
       await sheetWrite("updateTaskStatus", { rowNumber: Number(match[1]), status: taskStatusForSheetWrite(nextStatus) });
+      if (nextStatus !== "Done") {
+        removeCompletionHistoryForTask(task);
+        saveState();
+      }
       setKanbanStatus(`Saved “${displayTaskTitle(task) || "task"}” as ${label}.`, "success");
       setApiStatus("Saved to Google Sheet.", "success");
     } catch (err) {
@@ -1261,6 +1342,7 @@ async function moveKanbanTask(taskId, fromStatus, toStatus, card) {
   }
 
   applyLocalTaskStatus(task, nextStatus);
+  if (nextStatus !== "Done") removeCompletionHistoryForTask(task);
   saveState();
   kanbanBusy = false;
   setKanbanStatus(`Moved local demo task “${displayTaskTitle(task) || "task"}” to ${label} (this browser only).`, "info");
@@ -3042,7 +3124,9 @@ function setupDashboardTabs() {
     });
     // Return Capture to its four action rows whenever it is opened from navigation.
     if (selected.tab.id === "capture-tab") {
-      document.getElementById("quick-task-panel")?.classList.remove("is-open");
+      closeCaptureDetails();
+    } else {
+      restoreCaptureDetailPanels();
     }
   }
 
